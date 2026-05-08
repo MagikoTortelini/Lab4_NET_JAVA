@@ -1,0 +1,52 @@
+﻿@page "/sentiment"
+@rendermode InteractiveServer
+@using Microsoft.Extensions.ML
+
+<div class="page-center">
+	<div class="Prediction-outer">
+	<h1>Jak się dzisiaj czujesz?</h1>
+	<textarea class="form-control" @oninput="@Input" />
+		<button class="btn btn-sentiment" @onclick="analyze">Analizuj</button>
+		<div class=@div_class>
+			<h3>@Prediction_output</h3>
+			<h5>@Prediction_score</h5>
+		</div>
+	</div>
+</div>
+
+@code {
+	private string user_input="";
+	private string Prediction_output = "";
+	private string Prediction_score = "";
+	private string div_class = "";
+	private MODEL.ModelOutput? prediction;
+	private void analyze()
+	{
+		if (!string.IsNullOrWhiteSpace(user_input))
+		{
+			var input = new MODEL.ModelInput { Text = user_input };
+			prediction = MODEL.Predict(input);
+			Prediction_score = $"Pewność analizy: {prediction.Score.Max():P2}";
+			if (prediction.PredictedLabel=="positive")
+			{
+				div_class = "Positive";
+				Prediction_output = $"Twój nastrój to: Pozytywny";
+			}
+			else if (prediction.PredictedLabel == "negative")
+			{
+				div_class = "Negative";
+				Prediction_output = $"Twój nastrój to: Negatywny";
+			}
+			else
+			{
+				div_class = "Neutral";
+				Prediction_output = $"Twój nastrój to: Neutralny";
+			}
+
+		}
+	}
+	private void Input(ChangeEventArgs arg)
+	{
+		user_input = arg.Value.ToString();
+	}
+}

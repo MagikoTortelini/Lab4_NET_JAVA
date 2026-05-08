@@ -49,3 +49,68 @@ h1:focus {
 .darker-border-checkbox.form-check-input {
     border-color: #929292;
 }
+.Prediction-outer {
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+.page-center {
+    display: flex;
+    justify-content: center; 
+    align-items: center; 
+    height: 100vh;
+    padding:10px
+}
+
+.Positive {
+    background-color: lawngreen;
+    flex-direction: column;
+    padding: 10px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: justify;
+    border: 1px;
+    border-radius: .25rem;
+    min-height: 150px;
+    max-height: 700px;
+    color:white;
+}
+.Negative {
+    background-color: crimson;
+    gap: 20px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: justify;
+    border: 1px;
+    border-radius: .25rem;
+    padding: 10px;
+    min-height: 150px;
+    max-height: 700px;
+    color: white;
+}
+.Neutral {
+    background-color: grey;
+    gap: 20px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: justify;
+    border: 1px;
+    border-radius: 0.25rem;
+    padding: 10px;
+    min-height: 150px;
+    max-height: 700px;
+    color: white;
+}
+.btn-sentiment {
+    color: #fff;
+    background-color: #1b6ec2;
+    border-color: #1861ac;
+    width:100%;
+    
+}
