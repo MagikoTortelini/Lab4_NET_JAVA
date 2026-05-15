@@ -1,0 +1,109 @@
+﻿@page "/movies/details"
+@rendermode InteractiveServer
+@using Microsoft.EntityFrameworkCore
+@using Zadanie3
+@inject IDbContextFactory<Zadanie3.Data.ApplicationDbContext> DbFactory
+@inject NavigationManager NavigationManager
+
+<PageTitle>Details</PageTitle>
+
+<h1>Details</h1>
+
+<div>
+    <h2>Movies</h2>
+    <hr />
+    @if (movies is null)
+    {
+        <p><em>Loading...</em></p>
+    }
+    else {
+        <div class="Details-wrap">
+            <div class="left">
+            <dl class="row">
+                <dt class="col-sm-2">Title</dt>
+                <dd class="col-sm-10">@movies.Title</dd>
+                <dt class="col-sm-2">Description</dt>
+                <dd class="col-sm-10">@movies.Description</dd>
+                <dt class="col-sm-2">RelaseDate</dt>
+                <dd class="col-sm-10">@movies.RelaseDate</dd>
+                <dt class="col-sm-2">Rateg</dt>
+                <dd class="col-sm-10">@movies.Rate_avg.ToString()</dd>
+                <dt class="col-sm-2">Rate count</dt>
+                <dd class="col-sm-10">@movies.rate_count</dd>
+                <dt class="col-sm-2">Genre</dt>
+                <dd class="col-sm-10">@movies.genre</dd>
+            </dl>
+                <AuthorizeView>
+                    <Authorized>
+                        <div class="mt-3">
+                            <h4>Oceń film</h4>
+
+                            @for (int i = 1; i <= 5; i++)
+                            {
+                                int score = i;
+
+                                <button type="button"
+                                        class="btn btn-warning me-2"
+                                        @onclick="@(() => AddRate(score))">
+                                    @score
+                                </button>
+                            }
+                        </div>
+                    </Authorized>
+                </AuthorizeView>
+            </div>
+            <div class="img-div">
+                <img class="movie-img" src="@movies.image_url" />
+            </div>
+        </div>
+        <div>
+            <AuthorizeView>
+                <Authorized>
+                    <a href="@($"/movies/edit?id={movies.Id}")">Edit</a> |
+                </Authorized>
+            </AuthorizeView>
+            <a href="@($"/movies")">Back to List</a>
+        </div>
+       
+    }
+</div>
+
+@code {
+    private Movies? movies;
+
+    [SupplyParameterFromQuery]
+    private int Id { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        using var context = DbFactory.CreateDbContext();
+        movies = await context.Movies.FirstOrDefaultAsync(m => m.Id == Id);
+
+        if (movies is null)
+        {
+            NavigationManager.NavigateTo("notfound");
+        }
+    }
+    private async Task AddRate(int score)
+    {
+        if (movies is null)
+            return;
+
+        movies.rate_count += 1;
+        movies.rates += score;
+
+        movies.Rate_avg = movies.rate_count == 0
+            ? 0
+            : Math.Round((double)movies.rates / movies.rate_count, 2);
+
+        using var context = DbFactory.CreateDbContext();
+        context.Attach(movies).State = EntityState.Modified;
+
+        await context.SaveChangesAsync();
+    }
+    private bool MoviesExists(int id)
+    {
+        using var context = DbFactory.CreateDbContext();
+        return context.Movies.Any(e => e.Id == id);
+    }
+}

@@ -1,0 +1,50 @@
+﻿@page "/movies"
+@using Microsoft.EntityFrameworkCore
+@rendermode InteractiveServer
+@using Microsoft.AspNetCore.Components.QuickGrid
+@using Zadanie3
+@using Zadanie3.Data
+@implements IAsyncDisposable
+@inject IDbContextFactory<Zadanie3.Data.ApplicationDbContext> DbFactory
+
+<PageTitle>Index</PageTitle>
+
+<h1>Index</h1>
+
+<p>
+    <AuthorizeView>
+        <Authorized>
+            <a href="movies/create">Create New</a>
+        </Authorized>
+    </AuthorizeView>
+</p>
+
+<QuickGrid Class="table" Items="context.Movies">
+    <PropertyColumn Property="m => m.Title" Title="Title" Sortable="true" />
+    <PropertyColumn Property="m => m.Rate_avg" Title="Rate" Sortable="true" />
+    <PropertyColumn Property="m => m.rate_count" Title="Count" Sortable="true" />
+    <PropertyColumn Property="m => m.RelaseDate" Title="Date" Sortable="true" />
+
+    <TemplateColumn Context="movies">
+        <AuthorizeView>
+         <Authorized>
+        <a href="@($"movies/edit?id={movies.Id}")">Edit</a> |
+        <a href="@($"movies/delete?id={movies.Id}")">Delete</a> |
+            </Authorized>
+        </AuthorizeView>
+
+        <a href="@($"movies/details?id={movies.Id}")">Details</a> 
+        
+    </TemplateColumn>
+</QuickGrid>
+
+@code {
+    private ApplicationDbContext context = default!;
+
+    protected override void OnInitialized()
+    {
+        context = DbFactory.CreateDbContext();
+    }
+
+    public async ValueTask DisposeAsync() => await context.DisposeAsync();
+}

@@ -1,0 +1,66 @@
+﻿@page "/movies/create"
+@using Microsoft.EntityFrameworkCore
+@using Zadanie3
+@using Microsoft.Extensions.ML
+@inject IDbContextFactory<Zadanie3.Data.ApplicationDbContext> DbFactory
+@inject NavigationManager NavigationManager
+
+
+<PageTitle>Create</PageTitle>
+
+<h1>Create</h1>
+
+<h2>Movies</h2>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <EditForm method="post" Model="Movies" OnValidSubmit="AddMovies" FormName="create" Enhance>
+            <DataAnnotationsValidator />
+            <ValidationSummary class="text-danger" role="alert"/>
+            <div class="mb-3">
+                <label for="title" class="form-label">Title:</label> 
+                <InputText id="title" @bind-Value="Movies.Title" class="form-control" /> 
+                <ValidationMessage For="() => Movies.Title" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="description" class="form-label">Description:</label> 
+                <InputText id="description" @bind-Value="Movies.Description" class="form-control" /> 
+                <ValidationMessage For="() => Movies.Description" class="text-danger" /> 
+            </div> 
+            <div class="mb-3">
+                <label for="image_url" class="form-label">image_url:</label>
+                <InputText id="image_url" @bind-Value="Movies.image_url" class="form-control" />
+                <ValidationMessage For="() => Movies.image_url" class="text-danger" />
+            </div>
+            <div class="mb-3">
+                <label for="relasedate" class="form-label">RelaseDate:</label> 
+                <InputDate id="relasedate" @bind-Value="Movies.RelaseDate" class="form-control" /> 
+                <ValidationMessage For="() => Movies.RelaseDate" class="text-danger" /> 
+            </div>               
+            <button type="submit" class="btn btn-primary">Create</button>
+        </EditForm>
+    </div>
+</div>
+
+<div>
+    <a href="/movies">Back to List</a>
+</div>
+
+@code {
+    [SupplyParameterFromForm]
+    private Movies Movies { get; set; } = new();
+    private Genre.ModelOutput? prediction;
+
+
+    // To protect from overposting attacks, see https://learn.microsoft.com/aspnet/core/blazor/forms/#mitigate-overposting-attacks.
+    private async Task AddMovies()
+    {
+        var input = new Genre.ModelInput{ Description = Movies.Description };
+        prediction = Genre.Predict(input);
+        Movies.genre = prediction.PredictedLabel;
+        using var context = DbFactory.CreateDbContext();
+        context.Movies.Add(Movies);
+        await context.SaveChangesAsync();
+        NavigationManager.NavigateTo("/movies");
+    }
+}

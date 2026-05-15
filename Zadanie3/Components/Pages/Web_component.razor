@@ -1,0 +1,25 @@
+﻿@page "/component"
+@rendermode InteractiveServer
+
+
+<h3>Youtube_webcomponent</h3>
+<div class="input_wraper">
+    <input class="form-control" @oninput="@Input" />
+</div>
+<div class="yt-wraper">
+<lite-youtube @key="video_id"
+    videoid=@video_id">
+</lite-youtube>
+</div>
+
+@code {
+    private string video_input = "";
+    private string video_id = "";
+    private void Input(ChangeEventArgs arg)
+    {
+        video_id = arg.Value.ToString();
+    }
+    
+
+
+}
